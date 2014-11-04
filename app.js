@@ -1,17 +1,20 @@
 var express = require('express');
+var exphbs  = require('express-handlebars');
 var mongoose = require('mongoose');
 var crawler = require('./crawler');
 var model = require('./model');
 var Post = model.Post;
 
 var app = express();
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
 
 app.get('/', function (req, res, next) {
   Post.find().sort({craete_at: -1}).limit(100).exec(function (err, docs) {
     if (err) {
       return next(err);
     }
-    res.send(docs);
+    res.render('posts', {docs: docs});
   });
 });
 
