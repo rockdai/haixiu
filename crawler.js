@@ -15,35 +15,31 @@ var q = async.queue(function (task, callback) {
       }
       var $ = cheerio.load(res.text);
       var location = $('.loc').text().replace('常居: \n', '').trim();
-      if (location) {
-        Post.findOne({url: postInfo.url}).exec(function (err, post) {
-          if (err) {
-            return callback(err);
-          }
-          if (!post) {
-            postInfo.author_location = location;
-            post = new Post({
-              url: postInfo.url,
-              title: postInfo.title,
-              imgs: postInfo.imgs,
-              author: postInfo.author,
-              author_url: postInfo.author_url,
-              author_location: location,
-            });
-            post.save(function (err) {
-              if (err) {
-                return callback(err);
-              }
-              console.log('got %s', postInfo.title);
-              callback(null);
-            });
-          } else {
+      Post.findOne({url: postInfo.url}).exec(function (err, post) {
+        if (err) {
+          return callback(err);
+        }
+        if (!post) {
+          postInfo.author_location = location;
+          post = new Post({
+            url: postInfo.url,
+            title: postInfo.title,
+            imgs: postInfo.imgs,
+            author: postInfo.author,
+            author_url: postInfo.author_url,
+            author_location: location,
+          });
+          post.save(function (err) {
+            if (err) {
+              return callback(err);
+            }
+            console.log('got %s', postInfo.title);
             callback(null);
-          }
-        });
-      } else {
-        callback(null);
-      }
+          });
+        } else {
+          callback(null);
+        }
+      });
     });
 }, 3);
 
