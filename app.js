@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var crawler = require('./crawler');
 var model = require('./model');
 var Post = model.Post;
+var config = require('./config');
 
 var app = express();
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
@@ -46,6 +47,6 @@ app.get('/beijing', function (req, res, next) {
 // 启动爬虫
 crawler.start();
 
-app.listen(3000, function () {
+app.listen(config.port, function () {
   console.log('app is listening at port 3000');
 });

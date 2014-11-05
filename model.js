@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-mongoose.connect('mongodb://localhost/haixiu');
+var config = require('./config');
+mongoose.connect(config.mongodb_url);
 
 var PostSchema = new Schema({
   url: String,
