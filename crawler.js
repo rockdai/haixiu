@@ -30,20 +30,29 @@ var q = async.queue(function (task, callback) {
               author_url: postInfo.author_url,
               author_location: location,
             });
-            post.save();
+            post.save(function (err) {
+              if (err) {
+                return callback(err);
+              }
+              console.log('got %s', postInfo.title);
+              callback(null);
+            });
+          } else {
+            callback(null);
           }
         });
+      } else {
+        callback(null);
       }
-      callback(null);
     });
 }, 3);
 
 function fetchHaixiuzu() {
-  superagent.get('https://database.duoshuo.com/api/threads/listPosts.json?thread_key=haixiuzu&page=1&limit=10')
+  superagent.get('https://database.duoshuo.com/api/threads/listPosts.json?thread_key=haixiuzu&page=1&limit=100')
     .set('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36')
     .end(function (err, res) {
       if (err) {
-        return console.error(err);
+        return console.error('fetchHaixiuzu', err);
       }
       var json = JSON.parse(res.text);
       var parentPosts = json.parentPosts;
@@ -51,7 +60,9 @@ function fetchHaixiuzu() {
         var postInfo =  parentPosts[postId];
         postInfo = JSON.parse(new Buffer(postInfo.message, 'base64'));
         q.push(postInfo, function (err) {
-          return console.error(err);
+          if (err) {
+            return console.error(err);
+          }
         });
       }
     });

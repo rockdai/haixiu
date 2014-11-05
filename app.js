@@ -10,6 +10,10 @@ app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
 app.get('/', function (req, res, next) {
+  res.render('home');
+});
+
+app.get('/all', function (req, res, next) {
   Post.find().sort({craete_at: -1}).limit(100).exec(function (err, docs) {
     if (err) {
       return next(err);
@@ -24,7 +28,7 @@ app.get('/hangzhou', function (req, res, next) {
     if (err) {
       return next(err);
     }
-    res.send(docs);
+    res.render('posts', {docs: docs});
   });
 });
 
@@ -33,7 +37,7 @@ app.get('/beijing', function (req, res, next) {
     if (err) {
       return next(err);
     }
-    res.send(docs);
+    res.render('posts', {docs: docs});
   });
 });
 
