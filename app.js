@@ -15,7 +15,7 @@ app.get('/', function (req, res, next) {
 });
 
 app.get('/all', function (req, res, next) {
-  Post.find().sort({craete_at: -1}).limit(100).exec(function (err, docs) {
+  Post.find().sort({create_at: -1}).limit(100).exec(function (err, docs) {
     if (err) {
       return next(err);
     }
@@ -25,7 +25,7 @@ app.get('/all', function (req, res, next) {
 
 
 app.get('/hangzhou', function (req, res, next) {
-  Post.find({author_location: '浙江杭州'}).sort({craete_at: -1}).limit(100).exec(function (err, docs) {
+  Post.find({author_location: '浙江杭州'}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
     if (err) {
       return next(err);
     }
@@ -34,7 +34,7 @@ app.get('/hangzhou', function (req, res, next) {
 });
 
 app.get('/beijing', function (req, res, next) {
-  Post.find({author_location: '北京'}).sort({craete_at: -1}).limit(100).exec(function (err, docs) {
+  Post.find({author_location: '北京'}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
     if (err) {
       return next(err);
     }
@@ -43,7 +43,7 @@ app.get('/beijing', function (req, res, next) {
 });
 
 app.get('/nanning', function (req, res, next) {
-  Post.find({author_location: '广西南宁'}).sort({craete_at: -1}).limit(100).exec(function (err, docs) {
+  Post.find({author_location: '广西南宁'}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
     if (err) {
       return next(err);
     }
