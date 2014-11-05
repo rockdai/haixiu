@@ -5,9 +5,13 @@ var crawler = require('./crawler');
 var model = require('./model');
 var Post = model.Post;
 var config = require('./config');
+var moment = require('moment');
 
 var app = express();
-app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+var hbs = exphbs.create({
+  defaultLayout: 'main',
+});
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
 app.get('/', function (req, res, next) {
