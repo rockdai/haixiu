@@ -42,6 +42,15 @@ app.get('/beijing', function (req, res, next) {
   });
 });
 
+app.get('/nanning', function (req, res, next) {
+  Post.find({author_location: '广西南宁'}).sort({craete_at: -1}).limit(100).exec(function (err, docs) {
+    if (err) {
+      return next(err);
+    }
+    res.render('posts', {docs: docs});
+  });
+});
+
 
 
 // 启动爬虫
