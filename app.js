@@ -10,6 +10,11 @@ var moment = require('moment');
 var app = express();
 var hbs = exphbs.create({
   defaultLayout: 'main',
+  helpers: {
+    gaid: function () {
+      return config.gaid;
+    },
+  },
 });
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
@@ -17,6 +22,8 @@ app.set('view engine', 'handlebars');
 app.get('/', function (req, res, next) {
   res.render('home');
 });
+
+// 针对各个地域的 route 配置
 
 app.get('/all', function (req, res, next) {
   Post.find().sort({create_at: -1}).limit(100).exec(function (err, docs) {
@@ -27,8 +34,6 @@ app.get('/all', function (req, res, next) {
   });
 });
 
-
-// 针对各个地域的 route 配置
 app.get('/hangzhou', function (req, res, next) {
   Post.find({author_location: '浙江杭州'}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
     if (err) {
