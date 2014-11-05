@@ -5,6 +5,7 @@ var cheerio = require('cheerio');
 var model = require('./model');
 var Post = model.Post;
 var eventproxy = require('eventproxy');
+var config = require('./config');
 
 var q = async.queue(function (task, callback) {
   var postInfo = task;
@@ -22,6 +23,7 @@ var q = async.queue(function (task, callback) {
   ep.all('fetch_author', function () {
     superagent.get(postInfo.author_url)
       .set('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36')
+      .set('Cookie', config.douban_cookie)
       .end(ep.done(function (res) {
         if (res.status !== 200) {
           console.error(403, postInfo.author_url);
@@ -48,7 +50,8 @@ var q = async.queue(function (task, callback) {
   ep.all('got_author', function () {
     callback();
   });
-}, 3);
+// 并发数
+}, 1);
 
 function fetchHaixiuzu() {
   var ep = new eventproxy();
@@ -57,6 +60,7 @@ function fetchHaixiuzu() {
   });
   superagent.get('https://database.duoshuo.com/api/threads/listPosts.json?thread_key=haixiuzu&page=1&limit=100')
     .set('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36')
+    .set('Cookie', config.douban_cookie)
     .end(ep.done(function (res) {
       var json = JSON.parse(res.text);
       var parentPosts = json.parentPosts;
