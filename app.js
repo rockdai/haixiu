@@ -37,6 +37,15 @@ app.get('/hangzhou', function (req, res, next) {
   });
 });
 
+app.get('/chengdu', function (req, res, next) {
+  Post.find({author_location: '四川成都'}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
+    if (err) {
+      return next(err);
+    }
+    res.render('posts', {docs: docs});
+  });
+});
+
 app.get('/beijing', function (req, res, next) {
   Post.find({author_location: '北京'}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
     if (err) {
