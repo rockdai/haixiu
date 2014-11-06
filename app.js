@@ -70,6 +70,6 @@ for (var i = 0; i < cities.length; i++) {
 // 启动爬虫
 crawler.start();
 
-app.listen(config.port, function () {
-  console.log('app is listening at port 3000');
+var server = app.listen(config.port, function () {
+  console.log('app is listening ' + server.address().port);
 });
