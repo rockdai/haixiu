@@ -5,7 +5,6 @@ var crawler = require('./crawler');
 var model = require('./model');
 var Post = model.Post;
 var config = require('./config');
-var moment = require('moment');
 
 mongoose.connect(config.mongodb_url);
 
@@ -27,7 +26,13 @@ var cities = [
   {key: 'beijing', name: '北京'},
   {key: 'chengdu', name: '四川成都'},
   {key: 'nanning', name: '广西南宁'},
-  {key: 'changsha', name: '湖南长沙'}
+  {key: 'changsha', name: '湖南长沙'},
+  {key: 'changsanjiao', name: '长三角', names: [
+    '浙江杭州', '浙江温州', '浙江宁波', '浙江台州',
+    '浙江嘉兴', '浙江金华', '浙江绍兴', '浙江湖州',
+    '浙江丽水', '浙江衢州', '浙江舟山', '上海',
+    ]
+  },
 ];
 
 app.get('/', function (req, res, next) {
@@ -47,8 +52,9 @@ app.get('/all', function (req, res, next) {
 
 for (var i = 0; i < cities.length; i++) {
   (function (city) {
+    var names = city.names || [city.name];
     app.get('/city/' + city.key, function (req, res, next) {
-      Post.find({author_location: city.name}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
+      Post.find({author_location: {$in: names}}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
         if (err) {
           return next(err);
         }
