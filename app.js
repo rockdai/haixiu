@@ -7,6 +7,8 @@ var Post = model.Post;
 var config = require('./config');
 var moment = require('moment');
 
+mongoose.connect(config.mongodb_url);
+
 var app = express();
 var hbs = exphbs.create({
   defaultLayout: 'main',

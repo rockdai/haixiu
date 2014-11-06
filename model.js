@@ -1,7 +1,5 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var config = require('./config');
-mongoose.connect(config.mongodb_url);
 
 var PostSchema = new Schema({
   url: String,
