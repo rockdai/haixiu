@@ -55,7 +55,7 @@ var q = async.queue(function (task, callback) {
 
 function fetchHaixiuzu() {
   var ep = new eventproxy();
-  ep.fail(function (err) {
+  ep.on('error',function (err) {
     console.error(err);
   });
   superagent.get('https://database.duoshuo.com/api/threads/listPosts.json?thread_key=haixiuzu&page=1&limit=100')
