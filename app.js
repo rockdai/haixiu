@@ -47,6 +47,24 @@ let cities = [
   {key: 'shenzhen', name: '广东深圳'},
 ];
 
+function fixImages(imgs) {
+  imgs = imgs || [];
+  return imgs.map(function (img) {
+    if (img && img.startsWith('https://')) {
+      img = img.replace('https://', '//');
+    }
+    return img;
+  });
+}
+
+function fixDocs(docs) {
+  docs = docs || [];
+  return docs.map(function (doc) {
+    doc.imgs = fixImages(doc.imgs);
+    return doc;
+  });
+}
+
 app.get('/', function (req, res, next) {
   res.render('home', {cities: cities});
 });
@@ -58,6 +76,7 @@ app.get('/all', function (req, res, next) {
     if (err) {
       return next(err);
     }
+    docs = fixDocs(docs);
     res.render('posts', {docs: docs});
   });
 });
@@ -70,6 +89,7 @@ for (let i = 0; i < cities.length; i++) {
         if (err) {
           return next(err);
         }
+        docs = fixDocs(docs);
         res.render('posts', {docs: docs});
       });
     });
@@ -90,6 +110,7 @@ app.get('/author/:authorId', function (req, res, next) {
       // 取最近一条帖子的昵称
       authorName = docs[0].author_name;
     }
+    docs = fixDocs(docs);
     res.render('author', {
       authorId: authorId,
       authorName: authorName,

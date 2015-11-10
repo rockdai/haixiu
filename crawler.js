@@ -27,34 +27,16 @@ function onerror(err) {
   console.log(err);
 }
 
-function fixImagesPath(imgs) {
-  imgs = imgs || [];
-  return imgs.map(function (img) {
-    if (img && img.startsWith('https://')) {
-      img = img.replace('https://', 'http://');
-    }
-    return img;
-  });
-}
-
 function* handleTopic(topic) {
   topic = topic || {};
   let topicId = topic.id;
-  let imgs = fixImagesPath(_.pluck(topic.photos, 'alt'));
+  let imgs = _.pluck(topic.photos, 'alt');
 
-  let doc = yield Post.findOne({id: topicId}).exec();
-  if (doc) {
-    let updates = {
-      title: topic.title,
-      imgs: _.union(imgs, doc.imgs),
-      author_name: topic.authorInfo.name,
-      author_url: topic.authorInfo.alt,
-      author_location: topic.authorInfo.loc_name || '',
-      update_at: new Date(),
-    };
-    return yield doc.update(updates).exec();
+  let exists = yield Post.findOne({id: topicId}).exec();
+  if (exists) {
+    imgs = _.union(imgs, exists.imgs);
   }
-  let post = new Post({
+  let post = {
     id: topicId,
     url: `http://www.douban.com/group/topic/${topicId}/`,
     title: topic.title,
@@ -63,8 +45,9 @@ function* handleTopic(topic) {
     author_name: topic.authorInfo.name,
     author_url: topic.authorInfo.alt,
     author_location: topic.authorInfo.loc_name || '',
-  });
-  return yield post.save();
+    update_at: new Date(),
+  };
+  return yield Post.update({id: topicId}, post, {upsert: true}).exec();
 }
 
 function fetchHaixiuzu() {
