@@ -51,8 +51,9 @@ function fixImages(imgs) {
   imgs = imgs || [];
   return imgs.map(function (img) {
     if (img && img.startsWith('https://')) {
-      img = img.replace('https://', '//');
+      img = img.replace('https://', 'http://');
     }
+    img = img.replace('.doubanio.com', '.douban.com');
     return img;
   });
 }
