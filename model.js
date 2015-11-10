@@ -1,8 +1,6 @@
 /**!
  * haixiu - model.js
  *
- * Authors:
- *   rockdai <rockdai@qq.com>
  */
 
 'use strict';

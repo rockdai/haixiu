@@ -1,8 +1,6 @@
 /**!
  * haixiu - crawler.js
  *
- * Authors:
- *   rockdai <rockdai@qq.com>
  */
 
 'use strict';
