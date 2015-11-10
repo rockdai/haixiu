@@ -27,10 +27,20 @@ function onerror(err) {
   console.log(err);
 }
 
+function fixImagesPath(imgs) {
+  imgs = imgs || [];
+  return imgs.map(function (img) {
+    if (img && img.startsWith('https://')) {
+      img = img.replace('https://', 'http://');
+    }
+    return img;
+  });
+}
+
 function* handleTopic(topic) {
   topic = topic || {};
   let topicId = topic.id;
-  let imgs = _.pluck(topic.photos, 'alt');
+  let imgs = fixImagesPath(_.pluck(topic.photos, 'alt'));
 
   let doc = yield Post.findOne({id: topicId}).exec();
   if (doc) {
