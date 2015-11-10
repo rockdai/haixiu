@@ -1,15 +1,25 @@
-var express = require('express');
-var exphbs  = require('express-handlebars');
-var mongoose = require('mongoose');
-var crawler = require('./crawler');
-var model = require('./model');
-var Post = model.Post;
-var config = require('./config');
+/**!
+ * haixiu - app.js
+ *
+ */
+
+'use strict';
+
+/**
+ * Module dependencies.
+ */
+const express = require('express');
+const exphbs  = require('express-handlebars');
+const mongoose = require('mongoose');
+const crawler = require('./crawler');
+const model = require('./model');
+const Post = model.Post;
+const config = require('./config');
 
 mongoose.connect(config.mongodb_url);
 
-var app = express();
-var hbs = exphbs.create({
+let app = express();
+let hbs = exphbs.create({
   defaultLayout: 'main',
   helpers: {
     gaid: function () {
@@ -20,7 +30,7 @@ var hbs = exphbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-var cities = [
+let cities = [
   {key: 'hangzhou', name: '浙江杭州'},
   {key: 'shanghai', name: '上海'},
   {key: 'beijing', name: '北京'},
@@ -37,40 +47,50 @@ var cities = [
   {key: 'shenzhen', name: '广东深圳'},
 ];
 
+function fixImages(imgs) {
+  imgs = imgs || [];
+  return imgs.map(function (img) {
+    if (img && img.startsWith('https://')) {
+      img = img.replace('https://', 'http://');
+    }
+    img = img.replace('.doubanio.com', '.douban.com');
+    return img;
+  });
+}
+
+function fixDocs(docs) {
+  docs = docs || [];
+  return docs.map(function (doc) {
+    doc.imgs = fixImages(doc.imgs);
+    return doc;
+  });
+}
+
 app.get('/', function (req, res, next) {
   res.render('home', {cities: cities});
 });
 
-function getDocsAuthorId(docs) {
-  docs = docs || [];
-  var reg = /http:\/\/www.douban.com\/group\/people\/(\w+)(\/)?/;
-  for (var i = 0; i < docs.length; i++) {
-    docs[i].authorId = reg.exec(docs[i].author_url)[1];
-  }
-  return docs;
-}
-
 // 针对各个地域的 route 配置
 
 app.get('/all', function (req, res, next) {
-  Post.find().sort({create_at: -1}).limit(100).exec(function (err, docs) {
+  Post.find().sort({id: -1}).limit(100).exec(function (err, docs) {
     if (err) {
       return next(err);
     }
-    docs = getDocsAuthorId(docs);
+    docs = fixDocs(docs);
     res.render('posts', {docs: docs});
   });
 });
 
-for (var i = 0; i < cities.length; i++) {
+for (let i = 0; i < cities.length; i++) {
   (function (city) {
-    var names = city.names || [city.name];
+    let names = city.names || [city.name];
     app.get('/city/' + city.key, function (req, res, next) {
-      Post.find({author_location: {$in: names}}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
+      Post.find({author_location: {$in: names}}).sort({id: -1}).limit(100).exec(function (err, docs) {
         if (err) {
           return next(err);
         }
-        docs = getDocsAuthorId(docs);
+        docs = fixDocs(docs);
         res.render('posts', {docs: docs});
       });
     });
@@ -81,22 +101,21 @@ for (var i = 0; i < cities.length; i++) {
 
 // 某个用户的发帖
 app.get('/author/:authorId', function (req, res, next) {
-  var authorId = req.params.authorId;
-  var authorUrl = 'http://www.douban.com/group/people/' + authorId + '/';
-  Post.find({author_url: authorUrl}).sort({create_at: -1}).limit(100).exec(function (err, docs) {
+  const authorId = req.params.authorId;
+  Post.find({author_id: authorId}).sort({id: -1}).limit(100).exec(function (err, docs) {
     if (err) {
       return next(err);
     }
-    var authorName = '';
+    let authorName = '';
     if (docs && docs.length) {
       // 取最近一条帖子的昵称
-      authorName = docs[0].author;
+      authorName = docs[0].author_name;
     }
-    docs = getDocsAuthorId(docs);
+    docs = fixDocs(docs);
     res.render('author', {
+      authorId: authorId,
       authorName: authorName,
-      authorUrl: authorUrl,
-      docs: docs
+      docs: docs,
     });
   });
 });
@@ -104,6 +123,6 @@ app.get('/author/:authorId', function (req, res, next) {
 // 启动爬虫
 crawler.start();
 
-var server = app.listen(config.port, function () {
+let server = app.listen(config.port, function () {
   console.log('app is listening ' + server.address().port);
 });
