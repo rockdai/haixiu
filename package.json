@@ -13,7 +13,7 @@
     "urllib-sync": "~1.1.2",
     "express": "^4.10.1",
     "express-handlebars": "^1.1.0",
-    "lodash": "^2.4.1",
+    "lodash": "^4.17.19",
     "mongoose": "^4.2.4"
   },
   "engines": {
